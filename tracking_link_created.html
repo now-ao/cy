@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Link de Rastreamento Criado{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-check-circle me-2"></i>Link de Rastreamento Criado!
+                </h4>
+            </div>
+            
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <i class="fas fa-satellite-dish me-2"></i>
+                    Seu link de rastreamento para <strong>{{ phone_number }}</strong> foi criado com sucesso!
+                </div>
+                
+                <div class="my-4">
+                    <label class="form-label fw-bold">Link de Rastreamento:</label>
+                    <div class="input-group mb-3">
+                        <input type="text" id="tracking_url" class="form-control" 
+                               value="{{ tracking_url }}" readonly>
+                        <button class="btn btn-primary" onclick="copyTrackingUrl()">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                    <div id="copy_message" class="text-success d-none">
+                        <i class="fas fa-check me-1"></i> Link copiado para a área de transferência!
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5 class="border-bottom pb-2 mb-3">Detalhes do Número</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-phone me-2 text-primary"></i>Número
+                                    </h6>
+                                    <p class="card-text">{{ phone_number }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-globe me-2 text-primary"></i>País
+                                    </h6>
+                                    <p class="card-text">{{ country }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-broadcast-tower me-2 text-primary"></i>Operadora
+                                    </h6>
+                                    <p class="card-text">{{ carrier }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5 class="border-bottom pb-2 mb-3">Como Usar</h5>
+                    <ol class="list-group list-group-numbered mb-4">
+                        <li class="list-group-item d-flex">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Copie o link</div>
+                                Clique no botão "Copiar" para copiar o link de rastreamento
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Envie para o alvo</div>
+                                Envie o link via WhatsApp, SMS, e-mail ou qualquer outro método
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Acompanhe os resultados</div>
+                                Quando o link for aberto, os dados serão registrados automaticamente
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Todos os dados capturados serão exibidos na página de <a href="{{ url_for('tracking_results') }}" class="alert-link">Rastreamentos</a> assim que o link for acessado.
+                </div>
+            </div>
+            
+            <div class="card-footer bg-light d-flex justify-content-between">
+                <a href="{{ url_for('location_tracker') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+                <a href="{{ url_for('tracking_results') }}" class="btn btn-primary">
+                    <i class="fas fa-satellite-dish me-2"></i>Ver Rastreamentos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyTrackingUrl() {
+    var copyText = document.getElementById("tracking_url");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // Para dispositivos móveis
+    navigator.clipboard.writeText(copyText.value);
+    
+    // Mostrar mensagem de confirmação
+    var copyMessage = document.getElementById("copy_message");
+    copyMessage.classList.remove("d-none");
+    
+    // Esconder a mensagem após 3 segundos
+    setTimeout(function() {
+        copyMessage.classList.add("d-none");
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Histórico de Buscas{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-history me-2"></i>Histórico de Buscas</h3>
+                <form action="{{ url_for('clear_history') }}" method="post" onsubmit="return confirm('Tem certeza que deseja limpar todo o histórico de buscas?');">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt me-1"></i> Limpar Histórico
+                    </button>
+                </form>
+            </div>
+            <div class="card-body">
+                {% if history %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Número de Telefone</th>
+                                    <th scope="col">País</th>
+                                    <th scope="col">Operadora</th>
+                                    <th scope="col">Localização</th>
+                                    <th scope="col">Data/Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in history %}
+                                <tr>
+                                    <td>{{ item.phone_number }}</td>
+                                    <td>{{ item.country_code }}</td>
+                                    <td>{{ item.carrier or 'Não disponível' }}</td>
+                                    <td>
+                                        {% if item.latitude and item.longitude %}
+                                            <span data-bs-toggle="tooltip" title="{{ item.address }}">
+                                                {{ item.latitude|round(6) }}, {{ item.longitude|round(6) }}
+                                                <i class="fas fa-map-marker-alt text-danger ms-1"></i>
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Sem dados de localização</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.search_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Nenhum histórico de busca disponível ainda. Procure por um número de telefone para ver os resultados aqui.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>
+{% endblock %}

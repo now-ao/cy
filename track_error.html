@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Link Inválido{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Link Inválido</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-link-slash fa-5x text-danger"></i>
+                    </div>
+                    <h3 class="mb-3">Link de Rastreamento Inválido</h3>
+                    <p class="mb-4">
+                        O link que você acessou não é válido ou expirou. 
+                        Por favor, verifique o URL ou solicite um novo link de rastreamento.
+                    </p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Voltar ao Início
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

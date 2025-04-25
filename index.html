@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Início{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-search me-2"></i>Localizador de Telemóvel</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('search') }}" method="post" id="phone-search-form">
+                    <div class="mb-4">
+                        <label for="phone_number" class="form-label">Digite o Número de Telefone</label>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text"><i class="fas fa-phone-alt"></i></span>
+                            <input type="text" class="form-control form-control-lg" id="phone_number" name="phone_number" 
+                                   placeholder="+244 923 456 789" required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-map-marker-alt me-1"></i> Localizar
+                            </button>
+                        </div>
+                        <small class="text-muted">Formato: Formato internacional recomendado (ex: +244 para Angola, +1 para EUA)</small>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Instructions Card -->
+        <div class="card mt-4 shadow">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Como Funciona</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-phone-alt fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Digite o Número</h5>
+                        <p class="text-center">Insira um número de telefone com código do país para melhores resultados.</p>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-satellite fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Localização Precisa</h5>
+                        <p class="text-center">Nossa tecnologia usa GPS/GPRS para mostrar a localização exata do telemóvel com alta precisão.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-map-marked-alt fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Ver Resultados</h5>
+                        <p class="text-center">Veja a localização exata do telemóvel em um mapa detalhado e preciso com tecnologia GPS.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <strong>Aviso de Privacidade:</strong> Esta ferramenta utiliza tecnologia GPS/GPRS para fornecer a localização exata do telemóvel.
+                    A precisão é de 5-300 metros, dependendo da cobertura de sinal e região.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Basic form validation
+        const form = document.getElementById('phone-search-form');
+        
+        form.addEventListener('submit', function(event) {
+            const phoneInput = document.getElementById('phone_number');
+            const phoneNumber = phoneInput.value.trim();
+            
+            if (phoneNumber.length < 7) {
+                event.preventDefault();
+                alert('Por favor, insira um número de telefone válido');
+                phoneInput.focus();
+            }
+        });
+    });
+</script>
+{% endblock %}

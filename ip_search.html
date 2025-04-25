@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}Busca por IP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-network-wired me-2"></i>Analisador de IP</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Esta ferramenta realiza uma análise detalhada de qualquer endereço IP ou domínio, fornecendo 
+                    informações sobre localização geográfica, subdomínios (para domínios), rede, portas abertas e muito mais.
+                </div>
+                
+                <form id="ipSearchForm" action="{{ url_for('ip_search_results') }}" method="post">
+                    <div class="mb-4">
+                        <label for="ip_address" class="form-label">Endereço IP ou Domínio</label>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                            <input type="text" class="form-control form-control-lg" id="ip_address" name="ip_address" 
+                                   placeholder="192.168.1.1 ou example.com" required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i> Analisar
+                            </button>
+                        </div>
+                        <small class="text-muted">Digite um endereço IP (IPv4/IPv6) ou nome de domínio</small>
+                    </div>
+                </form>
+                
+                {% if error %}
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ error }}
+                </div>
+                {% endif %}
+                
+                {% if ip_data %}
+                <!-- Banner de título verde -->
+                <div class="bg-success text-white p-3 rounded-top text-center mb-0 mt-5">
+                    <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Resultados para {{ ip_data.ip }}</h4>
+                </div>
+                
+                <!-- Conteúdo em fundo escuro -->
+                <div class="bg-dark text-light p-4 rounded-bottom mb-4">
+                    <!-- Mapa -->
+                    {% if ip_data.latitude and ip_data.longitude %}
+                    <div class="mb-4">
+                        <h5 class="border-bottom border-secondary pb-2 mb-3"><i class="fas fa-map-marker-alt me-2"></i>Localização</h5>
+                        <div class="mb-3">
+                            {{ map_html|safe }}
+                        </div>
+                        <p class="text-center small text-secondary">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            {{ ip_data.city }}, {{ ip_data.state }}, {{ ip_data.country }}
+                            {% if ip_data.zip_code and ip_data.zip_code != '-' %} - {{ ip_data.zip_code }}{% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Informações IP no estilo da referência -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h5 class="border-bottom border-secondary pb-2 mb-3"><i class="fas fa-server me-2"></i>Informações Detalhadas</h5>
+                            
+                            <!-- Informações Básicas -->
+                            <div class="mb-3">
+                                <label class="mb-2">Endereço IP</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark text-light border-secondary">
+                                        <i class="fas fa-network-wired"></i>
+                                    </span>
+                                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                           value="{{ ip_data.ip }}" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="mb-2">ISP</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark text-light border-secondary">
+                                        <i class="fas fa-building"></i>
+                                    </span>
+                                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                           value="{{ ip_data.isp }}" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="mb-2">Conexão</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark text-light border-secondary">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                    </span>
+                                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                           value="{{ ip_data.connection_speed }}" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="mb-2">Cidade</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark text-light border-secondary">
+                                        <i class="fas fa-city"></i>
+                                    </span>
+                                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                           value="{{ ip_data.city }}" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="mb-2">País</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark text-light border-secondary">
+                                        <i class="fas fa-globe"></i>
+                                    </span>
+                                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                           value="{{ ip_data.country }}" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="mb-2">Operadora Móvel</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark text-light border-secondary">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </span>
+                                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                           value="{{ ip_data.mobile_brand if ip_data.mobile_brand else 'Não disponível' }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            
+                    <!-- Subdomínios (se for domínio) -->
+                    {% if ip_data.is_domain %}
+                    <div class="mb-3 mt-4">
+                        <h5 class="border-bottom border-secondary pb-2 mb-3">
+                            <i class="fas fa-sitemap me-2"></i>Subdomínios
+                        </h5>
+                        
+                        {% if ip_data.subdomains %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Subdomínio</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subdomain in ip_data.subdomains %}
+                                    <tr>
+                                        <td>{{ subdomain }}</td>
+                                        <td><span class="badge bg-success">Ativo</span></td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="https://{{ subdomain }}" target="_blank" class="btn btn-outline-light btn-sm">
+                                                    <i class="fas fa-external-link-alt"></i> Visitar
+                                                </a>
+                                                <form action="{{ url_for('ip_search_results') }}" method="post" class="d-inline">
+                                                    <input type="hidden" name="ip_address" value="{{ subdomain }}">
+                                                    <button type="submit" class="btn btn-outline-info btn-sm">
+                                                        <i class="fas fa-search"></i> Analisar
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="text-secondary mt-2 small">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Subdomínios são detectados através de tentativa direta - alguns podem estar inacessíveis ou protegidos.
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary bg-dark border-secondary text-secondary">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Nenhum subdomínio foi encontrado para <strong>{{ ip_data.original_query }}</strong>. Isso pode acontecer porque:
+                            <ul class="mt-2 mb-0">
+                                <li>O domínio usa poucos ou nenhum subdomínio</li>
+                                <li>Os subdomínios estão protegidos ou ocultos</li>
+                                <li>A técnica de detecção não conseguiu alcançar os subdomínios existentes</li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Informações sobre ASN -->
+                    <div class="mb-3 mt-4">
+                        <h5 class="border-bottom border-secondary pb-2 mb-3"><i class="fas fa-sitemap me-2"></i>Informações de Rede</h5>
+                        
+                        <div class="mb-3">
+                            <label class="mb-2">ASN</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark text-light border-secondary">
+                                    <i class="fas fa-project-diagram"></i>
+                                </span>
+                                <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                       value="{{ ip_data.whois_info.asn if ip_data.whois_info else 'Não disponível' }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="mb-2">Fuso Horário</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark text-light border-secondary">
+                                    <i class="fas fa-clock"></i>
+                                </span>
+                                <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                       value="{{ ip_data.time_zone }}" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="mb-2">Tipo de Uso</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark text-light border-secondary">
+                                    <i class="fas fa-tag"></i>
+                                </span>
+                                <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                       value="{{ ip_data.usage_type if ip_data.usage_type else 'Não disponível' }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botão para explorar mais detalhes -->
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#detailedInfo">
+                            <i class="fas fa-bars me-2"></i>Mostrar Informações Detalhadas
+                        </button>
+                    </div>
+                    
+                    <!-- Detalhes adicionais em área colapsável -->
+                    <div class="collapse mt-3" id="detailedInfo">
+                        <div class="card card-body bg-dark border-secondary">
+                            <h6 class="border-bottom border-secondary pb-2 mb-3">Dados Técnicos Completos</h6>
+                            
+                            <div class="bg-dark mb-2">
+                                <pre class="text-light p-3" style="overflow-x: auto; font-family: monospace; font-size: 0.85rem;">
+{{ ip_data|tojson(indent=2) }}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botões de ação -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('ip_search') }}" class="btn btn-outline-light">
+                            <i class="fas fa-arrow-left me-2"></i>Nova Busca
+                        </a>
+                        
+                        <a href="https://www.ip2location.io/demo/{{ ip_data.ip }}" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i>Ver Detalhes Completos
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Card de instruções -->
+        <div class="card mt-4 shadow">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Como Funciona</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-search fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Digite o IP ou Domínio</h5>
+                        <p class="text-center">Insira um endereço IP ou nome de domínio para iniciar a análise.</p>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-database fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Análise Completa</h5>
+                        <p class="text-center">Nossa tecnologia verifica múltiplas fontes de dados e serviços para coletar informações detalhadas.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-map-marked-alt fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Resultados Detalhados</h5>
+                        <p class="text-center">Visualize informações geográficas, subdomínios, dados de rede, WHOIS e portas abertas em uma interface intuitiva.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .leaflet-container {
+        height: 300px;
+        width: 100%;
+        border-radius: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('ipSearchForm');
+    
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            const ipInput = document.getElementById('ip_address').value.trim();
+            
+            if (!ipInput) {
+                e.preventDefault();
+                alert('Por favor, insira um endereço IP ou domínio válido.');
+                return false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

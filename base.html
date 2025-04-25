@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTelus | {% block title %}Início{% endblock %}</title>
+    <link rel="icon" href="https://i.postimg.cc/1z6cM4mB/A-stylish-smartphone-displaying-a-padlock-icon-representing-the-MTelus-app-MTelus-should-be-written.jpg" type="image/jpeg">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Leaflet CSS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+    <style>
+        /* Hide deployment bar */
+        .replit-ui-theme-root .css-1vbeog1-Modal {
+            display: none !important;
+        }
+        
+        :root {
+            --replit-bg: #0e1525;
+            --replit-dark: #1c2333;
+            --replit-accent: #7b61ff;
+            --replit-light-accent: #3a4052;
+            --replit-text: #f5f9fc;
+            --replit-muted: #6d7484;
+            --replit-border: #2b3245;
+            --replit-hover: #2b3245;
+            --replit-yellow: #ffcc57;
+            --replit-green: #56d364;
+        }
+
+        body {
+            background-color: var(--replit-bg);
+            color: var(--replit-text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        
+
+        /* Bottom Tab Bar */
+        .bottom-tab-bar {
+            background: var(--replit-dark);
+            padding: 10px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+            width: 100%;
+            border-top: 1px solid var(--replit-border);
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            border: none;
+            background: transparent;
+            text-decoration: none;
+        }
+
+        .tab-btn i {
+            font-size: 24px;
+            color: var(--replit-text);
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: #7c3aed;
+        }
+
+        .tab-btn.active i {
+            color: #fff;
+        }
+
+        .tab-btn:hover {
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .bottom-tab-bar::after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 36px;
+            height: 4px;
+            background: #7c3aed;
+            border-radius: 2px;
+        }
+
+        /* Status bar under header */
+        .status-bar {
+            background-color: var(--replit-dark);
+            border-bottom: 1px solid var(--replit-border);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            color: var(--replit-accent);
+            font-size: 0.9rem;
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .status-actions button {
+            background-color: transparent;
+            border: none;
+            color: var(--replit-text);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status-actions button:hover {
+            background-color: var(--replit-hover);
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 16px;
+            padding-bottom: 80px; /* Space for bottom tab bar */
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Dropdown menu */
+        .dropdown-menu {
+            background-color: var(--replit-dark);
+            border: 1px solid var(--replit-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .dropdown-item {
+            color: var(--replit-text);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--replit-hover);
+            color: var(--replit-text);
+        }
+
+        /* Card styling */
+        .card {
+            background-color: var(--replit-dark);
+            border: 1px solid var(--replit-border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--replit-border);
+            background-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background-color: var(--replit-accent);
+            border-color: var(--replit-accent);
+        }
+
+        .btn-primary:hover {
+            background-color: #6a52e0;
+            border-color: #6a52e0;
+        }
+
+        .btn-outline-primary {
+            color: var(--replit-accent);
+            border-color: var(--replit-accent);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--replit-accent);
+            border-color: var(--replit-accent);
+        }
+
+        .alert {
+            border-radius: 8px;
+        }
+
+        .table {
+            color: var(--replit-text);
+        }
+
+        /* Developer info modal */
+        #developerInfoModal .modal-content {
+            background-color: var(--replit-dark);
+            border: 1px solid var(--replit-border);
+        }
+
+        #developerInfoModal .modal-header {
+            border-bottom: 1px solid var(--replit-border);
+        }
+
+        #developerInfoModal .modal-footer {
+            border-top: 1px solid var(--replit-border);
+        }
+
+        /* More Tools Dropdown - Fixed Position */
+        .more-tools-dropdown {
+            position: fixed;
+            bottom: 70px;
+            right: 10px;
+            background-color: var(--replit-dark);
+            border: 1px solid var(--replit-border);
+            border-radius: 8px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
+            width: 200px;
+            z-index: 1050;
+            display: none;
+        }
+
+        .more-tools-dropdown.show {
+            display: block;
+        }
+
+        .more-tools-dropdown a {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            color: var(--replit-text);
+            text-decoration: none;
+            border-bottom: 1px solid var(--replit-border);
+        }
+
+        .more-tools-dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .more-tools-dropdown a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .more-tools-dropdown a:hover {
+            background-color: var(--replit-hover);
+        }
+
+        /* App Info Tooltip - Fixed Position */
+        .app-info-tooltip {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background-color: var(--replit-dark);
+            border: 1px solid var(--replit-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            width: 300px;
+            padding: 16px;
+            z-index: 1050;
+            display: none;
+        }
+
+        .app-info-tooltip.show {
+            display: block;
+        }
+
+        /* Leaflet map container */
+        .leaflet-container {
+            border-radius: 8px;
+            border: 1px solid var(--replit-border);
+        }
+
+        /* Progress status animation */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .status-running {
+            animation: pulse 2s infinite;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-running i {
+            color: var(--replit-green);
+            margin-right: 8px;
+        }
+
+        .status-paused i {
+            color: var(--replit-yellow);
+            margin-right: 8px;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Status Bar (for active processes) -->
+    <div class="status-bar" id="statusBar">
+        <div class="status-indicator" id="statusIndicator">
+            <i class="fas fa-circle"></i>
+            <span class="ms-2" id="statusText">Pronto</span>
+        </div>
+
+        <div class="status-actions">
+            <button id="pauseResumeBtn" style="display: none;">
+                <i class="fas fa-pause" id="pauseResumeIcon"></i> 
+                <span id="pauseResumeText">Pausar</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="bottom-tab-bar">
+        <div class="main-tools" style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 20px; display: flex; gap: 40px;">
+            <a href="{{ url_for('index') }}" class="tab-btn {% if request.path == url_for('index') %}active{% endif %}" id="locatorTab" title="Localizador">
+                <i class="fas fa-magnifying-glass"></i>
+            </a>
+            <a href="{{ url_for('ip_search') }}" class="tab-btn {% if request.path == url_for('ip_search') %}active{% endif %}" id="ipTab" title="IP">
+                <i class="fas fa-server"></i>
+            </a>
+            <a href="{{ url_for('location_tracker') }}" class="tab-btn {% if request.path == url_for('location_tracker') %}active{% endif %}" id="trackingTab" title="Rastreio">
+                <i class="fas fa-satellite"></i>
+            </a>
+        </div>
+        <button class="tab-btn" id="moreToolsBtn" title="Mais" style="margin-left: auto; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 16px;">
+            <i class="fas fa-window-restore"></i>
+        </button>
+    </div>
+
+    <!-- More Tools Dropdown -->
+    <div class="more-tools-dropdown" id="moreToolsDropdown">
+        <a href="{{ url_for('social_search') }}" class="{% if request.path == url_for('social_search') %}active{% endif %}">
+            <i class="fas fa-users"></i> Busca Social
+        </a>
+        <a href="{{ url_for('tracking_results') }}" class="{% if request.path == url_for('tracking_results') %}active{% endif %}">
+            <i class="fas fa-satellite-dish"></i> Rastreamentos
+        </a>
+        <a href="{{ url_for('history') }}" class="{% if request.path == url_for('history') %}active{% endif %}">
+            <i class="fas fa-history"></i> Histórico
+        </a>
+        <a href="{{ url_for('check_phishing_page') }}" class="{% if request.path == url_for('check_phishing_page') %}active{% endif %}">
+            <i class="fas fa-shield-alt"></i> Verificar Phishing
+        </a>
+        <a href="{{ url_for('email_analysis') }}" class="{% if request.path == url_for('email_analysis') %}active{% endif %}">
+            <i class="fas fa-envelope"></i> Análise de Email
+        </a>
+    </div>
+
+    <!-- App Info Tooltip -->
+    <div class="app-info-tooltip" id="appInfoTooltip">
+        <h5><i class="fas fa-info-circle me-2"></i>Sobre o MTelus</h5>
+        <p>Uma plataforma avançada de inteligência de geolocalização especializada em rastreamento abrangente de dispositivos e IPs com tecnologias de identificação de localização em múltiplas camadas.</p>
+        <ul>
+            <li>Localizador de telefone</li>
+            <li>Analisador de IP com detecção de subdomínios</li>
+            <li>Rastreamento GPS em tempo real</li>
+            <li>Busca em redes sociais</li>
+        </ul>
+        <p class="mb-0"><small>Desenvolvido por Mike L'ange</small></p>
+    </div>
+
+    <!-- Developer Info Modal -->
+    <div class="modal fade" id="developerInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-code me-2"></i>Desenvolvedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <img src="https://i.postimg.cc/KzwjDNZy/Pics-Art-06-29-01-00-04.jpg" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                        <h4>Mike L'ange</h4>
+                        <p class="text-muted">Desenvolvedor Full Stack</p>
+                    </div>
+
+                    <div class="d-flex justify-content-center mb-4">
+                        <a href="https://t.me/mikelange" class="btn btn-outline-light mx-1" title="Telegram"><i class="fab fa-telegram"></i></a>
+                        <a href="https://wa.me/00244941233310" class="btn btn-outline-light mx-1" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.facebook.com/fb.mikelange" class="btn btn-outline-light mx-1" title="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="https://bit.ly/4iUK8Lb" class="btn btn-outline-light mx-1" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="mailto:now.ao@proton.me" class="btn btn-outline-light mx-1" title="Email"><i class="fas fa-envelope"></i></a>
+                    </div>
+
+                    <p>Especialista em desenvolvimento de aplicações web e ferramentas de análise de dados. Criador do MTelus e outros sistemas de geolocalização e análise.</p>
+                    <p class="mb-0"><i class="fas fa-shield-alt me-1"></i> Use todas as ferramentas com responsabilidade e consentimento.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- App JS Files -->
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+
+    <!-- Main JS -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementos seguros - verificar se existem antes de usar
+        const moreToolsBtn = document.getElementById('moreToolsBtn');
+        const moreToolsDropdown = document.getElementById('moreToolsDropdown');
+        const chatBtn = document.getElementById('chatBtn');
+        const infoBtn = document.getElementById('infoBtn');
+        const appInfoTooltip = document.getElementById('appInfoTooltip');
+        const pauseResumeBtn = document.getElementById('pauseResumeBtn');
+        const pauseResumeIcon = document.getElementById('pauseResumeIcon');
+        const pauseResumeText = document.getElementById('pauseResumeText');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+
+        // More Tools Dropdown
+        if (moreToolsBtn && moreToolsDropdown) {
+            moreToolsBtn.addEventListener('click', function() {
+                moreToolsDropdown.classList.toggle('show');
+            });
+
+            // Hide dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (moreToolsBtn && moreToolsDropdown && 
+                    !moreToolsBtn.contains(event.target) && 
+                    !moreToolsDropdown.contains(event.target)) {
+                    moreToolsDropdown.classList.remove('show');
+                }
+
+                if (infoBtn && appInfoTooltip && 
+                    !infoBtn.contains(event.target) && 
+                    !appInfoTooltip.contains(event.target)) {
+                    appInfoTooltip.classList.remove('show');
+                }
+            });
+        }
+
+        // Chat/Developer Info Button
+        if (chatBtn) {
+            chatBtn.addEventListener('click', function() {
+                const developerInfoModal = new bootstrap.Modal(document.getElementById('developerInfoModal'));
+                developerInfoModal.show();
+            });
+        }
+
+        // Info Button
+        if (infoBtn && appInfoTooltip) {
+            infoBtn.addEventListener('click', function() {
+                appInfoTooltip.classList.toggle('show');
+            });
+        }
+
+        // Status indicators and pause/resume (example functionality)
+        // This would be connected to your actual app functionality
+        window.updateAppStatus = function(status, running = false) {
+            if (!statusText || !statusIndicator) return;
+            
+            statusText.textContent = status;
+
+            if (running) {
+                statusIndicator.classList.add('status-running');
+                statusIndicator.classList.remove('status-paused');
+                if (statusIndicator.querySelector('i')) {
+                    statusIndicator.querySelector('i').className = 'fas fa-circle';
+                }
+                if (pauseResumeBtn) {
+                    pauseResumeBtn.style.display = 'flex';
+                }
+                if (pauseResumeIcon) {
+                    pauseResumeIcon.className = 'fas fa-pause';
+                }
+                if (pauseResumeText) {
+                    pauseResumeText.textContent = 'Pausar';
+                }
+            } else if (status === 'Pausado') {
+                statusIndicator.classList.remove('status-running');
+                statusIndicator.classList.add('status-paused');
+                if (statusIndicator.querySelector('i')) {
+                    statusIndicator.querySelector('i').className = 'fas fa-pause-circle';
+                }
+                if (pauseResumeBtn) {
+                    pauseResumeBtn.style.display = 'flex';
+                }
+                if (pauseResumeIcon) {
+                    pauseResumeIcon.className = 'fas fa-play';
+                }
+                if (pauseResumeText) {
+                    pauseResumeText.textContent = 'Retomar';
+                }
+            } else {
+                statusIndicator.classList.remove('status-running');
+                statusIndicator.classList.remove('status-paused');
+                if (statusIndicator.querySelector('i')) {
+                    statusIndicator.querySelector('i').className = 'fas fa-circle';
+                }
+                if (pauseResumeBtn) {
+                    pauseResumeBtn.style.display = 'none';
+                }
+            }
+        };
+
+        // Example toggle pause/resume
+        if (pauseResumeBtn && pauseResumeText) {
+            pauseResumeBtn.addEventListener('click', function() {
+                if (pauseResumeText.textContent === 'Pausar') {
+                    window.updateAppStatus('Pausado', false);
+                } else {
+                    window.updateAppStatus('Processando...', true);
+                }
+            });
+        }
+
+        // Formulários específicos
+        {% if request.path == url_for('ip_search') %}
+        const ipSearchForm = document.getElementById('ipSearchForm');
+        if (ipSearchForm) {
+            ipSearchForm.addEventListener('submit', function() {
+                window.updateAppStatus('Analisando IP...', true);
+            });
+        }
+        {% elif request.path == url_for('location_tracker') %}
+        const trackerForm = document.getElementById('trackerForm');
+        if (trackerForm) {
+            trackerForm.addEventListener('submit', function() {
+                window.updateAppStatus('Gerando link de rastreamento...', true);
+            });
+        }
+        {% elif request.path == url_for('social_search') %}
+        const socialSearchForm = document.getElementById('socialSearchForm');
+        if (socialSearchForm) {
+            socialSearchForm.addEventListener('submit', function() {
+                window.updateAppStatus('Buscando perfis...', true);
+            });
+        }
+        {% endif %}
+    });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

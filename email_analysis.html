@@ -1,0 +1,77 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Análise de Email{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="bg-primary text-white p-3 rounded-top text-center mb-0">
+            <h4 class="mb-0"><i class="fas fa-envelope me-2"></i>Análise de Email</h4>
+        </div>
+        
+        <div class="bg-dark text-light p-4 rounded-bottom mb-4">
+            <div class="alert alert-info bg-primary bg-opacity-25 text-light border-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Verifique a validade e risco de um endereço de email usando nossa ferramenta de análise avançada.
+            </div>
+            
+            <form action="{{ url_for('analyze_email_address') }}" method="post" class="needs-validation mt-3" novalidate>
+                <div class="mb-4">
+                    <label for="email" class="form-label fw-bold mb-2">Endereço de Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Analisar Email
+                    </button>
+                </div>
+            </form>
+            
+            {% if email_data %}
+                <div class="mt-4">
+                    <h5 class="border-bottom pb-2">Resultados da Análise</h5>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="card bg-dark">
+                                <div class="card-body">
+                                    <h6 class="card-title">Status Geral</h6>
+                                    <p class="mb-1">Válido: <span class="badge bg-{{ 'success' if email_data.valid else 'danger' }}">{{ 'Sim' if email_data.valid else 'Não' }}</span></p>
+                                    <p class="mb-1">Risco de Fraude: <span class="badge bg-{{ 'success' if email_data.fraud_score < 30 else 'warning' if email_data.fraud_score < 70 else 'danger' }}">{{ email_data.fraud_score }}%</span></p>
+                                    <p class="mb-1">Entregabilidade: <span class="badge bg-info">{{ email_data.deliverability }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card bg-dark">
+                                <div class="card-body">
+                                    <h6 class="card-title">Detalhes</h6>
+                                    <p class="mb-1">Email Descartável: <span class="badge bg-{{ 'danger' if email_data.disposable else 'success' }}">{{ 'Sim' if email_data.disposable else 'Não' }}</span></p>
+                                    <p class="mb-1">DNS Válido: <span class="badge bg-{{ 'success' if email_data.dns_valid else 'danger' }}">{{ 'Sim' if email_data.dns_valid else 'Não' }}</span></p>
+                                    <p class="mb-1">Registro DMARC: <span class="badge bg-{{ 'success' if email_data.dmarc_record else 'warning' }}">{{ 'Sim' if email_data.dmarc_record else 'Não' }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if 'error' not in email_data %}
+                    <div class="mt-3">
+                        <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#rawData">
+                            <i class="fas fa-code me-2"></i>Ver Dados Completos
+                        </button>
+                        <div class="collapse mt-2" id="rawData">
+                            <div class="card card-body bg-dark">
+                                <pre class="text-light">{{ email_data | tojson(indent=2) }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

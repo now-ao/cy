@@ -1,0 +1,145 @@
+
+{% extends "base.html" %}
+
+{% block title %}Busca Social{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-users me-2"></i>Buscar Perfis Sociais</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Esta ferramenta busca e verifica perfis em redes sociais com base no nome fornecido. 
+                    Os resultados são agrupados por plataforma e verificados quando possível.
+                </div>
+                
+                <form id="socialSearchForm">
+                    <div class="mb-4">
+                        <label for="nome" class="form-label">Nome a pesquisar</label>
+                        <div class="input-group mb-2">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control form-control-lg" id="nome" 
+                                   placeholder="João Mário" required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i> Buscar
+                            </button>
+                        </div>
+                        <small class="text-muted">Digite o nome completo para melhores resultados (ex: João Mário)</small>
+                    </div>
+                </form>
+                
+                <div id="loading" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Buscando...</span>
+                    </div>
+                    <p class="mt-2">Buscando perfis sociais... Por favor, aguarde.</p>
+                </div>
+                
+                <div id="error-message" class="alert alert-danger d-none">
+                </div>
+                
+                <div id="resultados" class="mt-4 d-none">
+                    <h4 class="mb-3 border-bottom pb-2">Resultados Encontrados</h4>
+                    <div class="social-results">
+                        <!-- Os resultados serão inseridos aqui via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Card de instruções -->
+        <div class="card mt-4 shadow">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Como Funciona</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-user-check fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Digite o Nome</h5>
+                        <p class="text-center">Insira o nome completo da pessoa que deseja encontrar.</p>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-search fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Busca Inteligente</h5>
+                        <p class="text-center">Nossa tecnologia verifica múltiplas redes sociais populares para encontrar perfis correspondentes.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-2">
+                            <i class="fas fa-check-circle fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="text-center">Verificação</h5>
+                        <p class="text-center">Os resultados são verificados e organizados por plataforma para facilitar sua busca.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/social_search.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('socialSearchForm');
+    const resultsDiv = document.getElementById('resultados');
+    const socialResultsContainer = document.querySelector('.social-results');
+    const loadingDiv = document.getElementById('loading');
+    const errorMessageDiv = document.getElementById('error-message');
+    
+    searchForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Obtém o nome do formulário
+        const nome = document.getElementById('nome').value.trim();
+        
+        if (!nome) {
+            errorMessageDiv.textContent = 'Por favor, digite um nome para buscar.';
+            errorMessageDiv.classList.remove('d-none');
+            return;
+        }
+        
+        // Oculta mensagens de erro anteriores
+        errorMessageDiv.classList.add('d-none');
+        
+        // Mostra o indicador de carregamento
+        loadingDiv.classList.remove('d-none');
+        
+        // Oculta os resultados anteriores
+        resultsDiv.classList.add('d-none');
+        
+        try {
+            // Realiza a busca usando a função do arquivo social_search.js
+            const resultados = await buscarPerfilSocial(nome);
+            
+            // Verifica se há erro na resposta
+            if (resultados.erro) {
+                throw new Error(resultados.erro);
+            }
+            
+            // Renderiza os resultados usando a função do arquivo social_search.js
+            renderizarResultados(resultados, socialResultsContainer);
+            
+            // Mostra a seção de resultados
+            resultsDiv.classList.remove('d-none');
+        } catch (error) {
+            console.error('Erro na busca:', error);
+            errorMessageDiv.textContent = `Erro ao buscar perfis sociais: ${error.message}`;
+            errorMessageDiv.classList.remove('d-none');
+        } finally {
+            // Oculta o indicador de carregamento
+            loadingDiv.classList.add('d-none');
+        }
+    });
+});
+</script>
+{% endblock %}

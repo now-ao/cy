@@ -1,0 +1,152 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Análise de Segurança da URL</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                URL Analisada: <strong>{{ url }}</strong>
+            </div>
+
+            <!-- Status Principal -->
+            <div class="alert {% if is_phishing %}alert-danger{% else %}alert-success{% endif %} mt-3">
+                <h4 class="alert-heading">
+                    {% if is_phishing %}
+                        <i class="fas fa-exclamation-triangle me-2"></i>Alerta de Segurança!
+                    {% else %}
+                        <i class="fas fa-check-circle me-2"></i>URL Segura
+                    {% endif %}
+                </h4>
+                <p class="mb-0">
+                    {% if is_phishing %}
+                        Esta URL foi identificada como potencialmente perigosa.
+                    {% else %}
+                        Nenhuma ameaça significativa detectada.
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Indicadores Principais -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-dark text-light">
+                        <div class="card-body text-center">
+                            <h5>Pontuação de Risco</h5>
+                            <h2 class="mb-0">{{ confidence }}%</h2>
+                        </div>
+                    </div>
+                </div>
+                {% if details.domain_info %}
+                <div class="col-md-3">
+                    <div class="card bg-dark text-light">
+                        <div class="card-body text-center">
+                            <h5>Domínio</h5>
+                            <p class="mb-0">{{ details.domain }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-dark text-light">
+                        <div class="card-body text-center">
+                            <h5>Categoria</h5>
+                            <p class="mb-0">{{ details.domain_info.category }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-dark text-light">
+                        <div class="card-body text-center">
+                            <h5>Confiança</h5>
+                            <p class="mb-0">{{ details.domain_info.domain_trust }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Botão para detalhes -->
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#detailedInfo">
+                    <i class="fas fa-bars me-2"></i>Mostrar Informações Detalhadas
+                </button>
+            </div>
+
+            <!-- Detalhes Completos -->
+            <div class="collapse mt-4" id="detailedInfo">
+                <div class="card bg-dark text-light">
+                    <div class="card-body">
+                        {% if details %}
+                        <div class="row">
+                            <!-- Indicadores de Risco -->
+                            <div class="col-md-6 mb-4">
+                                <h5 class="border-bottom pb-2">Indicadores de Risco</h5>
+                                <ul class="list-unstyled">
+                                    {% for key, value in details.risk_indicators.items() %}
+                                    <li class="mb-2">
+                                        <i class="fas {% if value %}fa-times text-danger{% else %}fa-check text-success{% endif %} me-2"></i>
+                                        {{ key|title }}: {{ value }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <!-- Informações do Domínio -->
+                            <div class="col-md-6 mb-4">
+                                <h5 class="border-bottom pb-2">Informações do Domínio</h5>
+                                <ul class="list-unstyled">
+                                    {% for key, value in details.domain_info.items() %}
+                                    <li class="mb-2">
+                                        <strong>{{ key|title }}:</strong> {{ value }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <!-- Tecnologias -->
+                            {% if details.technologies %}
+                            <div class="col-md-6 mb-4">
+                                <h5 class="border-bottom pb-2">Tecnologias Detectadas</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for tech in details.technologies %}
+                                    <span class="badge bg-primary">{{ tech }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Registros DNS -->
+                            <div class="col-md-6 mb-4">
+                                <h5 class="border-bottom pb-2">Registros DNS</h5>
+                                {% for record_type, records in details.dns_records.items() %}
+                                <div class="mb-3">
+                                    <strong>{{ record_type|upper }}:</strong>
+                                    <ul class="list-unstyled ms-3">
+                                        {% for record in records %}
+                                        <li>{{ record }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-center">Dados detalhados não disponíveis</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ url_for('check_phishing_page') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Verificar outra URL
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

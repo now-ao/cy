@@ -1,0 +1,80 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0"><i class="fas fa-book me-2"></i>Termos de Uso e Informações do Sistema</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="mb-4">Funcionalidades do Sistema</h5>
+            
+            <div class="feature-section mb-4">
+                <h6><i class="fas fa-phone-alt me-2"></i>Localizador de Telefone</h6>
+                <p>Sistema avançado de geolocalização que permite localizar números de telefone com precisão, fornecendo informações detalhadas sobre a localização.</p>
+            </div>
+
+            <div class="feature-section mb-4">
+                <h6><i class="fas fa-server me-2"></i>Analisador de IP</h6>
+                <p>Ferramenta completa para análise de endereços IP, incluindo geolocalização, informações do provedor e detecção de serviços.</p>
+            </div>
+
+            <div class="feature-section mb-4">
+                <h6><i class="fas fa-satellite me-2"></i>Rastreamento GPS</h6>
+                <p>Sistema de rastreamento em tempo real com alta precisão, permitindo monitoramento contínuo de localização.</p>
+            </div>
+
+            <div class="feature-section mb-4">
+                <h6><i class="fas fa-users me-2"></i>Busca Social</h6>
+                <p>Ferramenta de busca em redes sociais para localizar perfis e informações públicas.</p>
+            </div>
+
+            <div class="feature-section mb-4">
+                <h6><i class="fas fa-shield-alt me-2"></i>Verificador de Phishing</h6>
+                <p>Sistema de detecção de sites maliciosos e tentativas de phishing.</p>
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="mb-4">Termos de Uso</h5>
+            <ul class="terms-list">
+                <li>Este sistema deve ser usado apenas para fins legais e éticos.</li>
+                <li>O usuário é responsável pelo uso adequado das ferramentas.</li>
+                <li>Não nos responsabilizamos pelo uso indevido do sistema.</li>
+                <li>Os dados coletados são tratados com confidencialidade.</li>
+                <li>O sistema não garante 100% de precisão nas informações.</li>
+            </ul>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('welcome') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.feature-section {
+    padding: 15px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.2);
+    margin-bottom: 15px;
+}
+
+.terms-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.terms-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--replit-border);
+}
+
+.terms-list li:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %}

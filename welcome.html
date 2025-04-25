@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="welcome-screen">
+    <div class="loading-animation mb-4">
+        <i class="fas fa-satellite fa-spin fa-3x text-primary"></i>
+    </div>
+
+    <div class="card welcome-card">
+        <div class="card-body">
+            <!-- App Info -->
+            <div class="text-center mb-4">
+                <img src="https://i.postimg.cc/1z6cM4mB/A-stylish-smartphone-displaying-a-padlock-icon-representing-the-MTelus-app-MTelus-should-be-written.jpg" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                <h2>MTelus</h2>
+                <p class="text-muted">Plataforma Avançada de Geolocalização</p>
+                <p>Uma ferramenta poderosa para análise e rastreamento de localização com recursos avançados de inteligência geográfica.</p>
+
+                <div class="feature-icons d-flex justify-content-center flex-wrap mb-4">
+                    <div class="feature-item m-2 text-center">
+                        <i class="fas fa-map-marker-alt fa-2x mb-2 text-primary"></i>
+                        <p>Localização</p>
+                    </div>
+                    <div class="feature-item m-2 text-center">
+                        <i class="fas fa-server fa-2x mb-2 text-primary"></i>
+                        <p>Análise de IP</p>
+                    </div>
+                    <div class="feature-item m-2 text-center">
+                        <i class="fas fa-satellite fa-2x mb-2 text-primary"></i>
+                        <p>Rastreamento</p>
+                    </div>
+                    <div class="feature-item m-2 text-center">
+                        <i class="fas fa-users fa-2x mb-2 text-primary"></i>
+                        <p>Busca Social</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Developer Info -->
+            <div class="developer-info card mb-4 p-3">
+                <h5 class="text-center mb-3"><i class="fas fa-code me-2"></i>Informações do Desenvolvedor</h5>
+                <div class="text-center">
+                    <p class="mb-2"><i class="fas fa-envelope me-2"></i>E-mail: now.ao@proton.me</p>
+                    <div class="support-info mt-3">
+                        <h6 class="mb-3">Apoiar o Desenvolvedor</h6>
+                        <p class="mb-2"><strong>Kwik:</strong> AO06042000000000048755641</p>
+                        <p class="mb-2"><strong>IBAN:</strong> AO06000600003428062730103</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms Acceptance -->
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="termsAcceptance">
+                <label class="form-check-label" for="termsAcceptance">
+                    <a href="{{ url_for('terms') }}" class="text-primary">Li e aceito os termos de uso do sistema</a>
+                </label>
+            </div>
+
+            <!-- Enter Button -->
+            <div class="text-center">
+                <button id="enterButton" class="btn btn-primary btn-lg" disabled>
+                    <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.welcome-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.welcome-card {
+    max-width: 100%;
+    width: 95%;
+    background: var(--replit-dark);
+    border: 1px solid var(--replit-border);
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .welcome-card {
+        max-width: 600px;
+    }
+    
+    .welcome-screen {
+        padding: 20px;
+    }
+}
+
+.loading-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+    }
+}
+
+.feature-item {
+    background: linear-gradient(145deg, var(--replit-dark) 0%, rgba(33, 37, 43, 0.95) 100%);
+    border: 1px solid var(--replit-border);
+    border-radius: 12px;
+    padding: 15px;
+    min-width: 100px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.feature-item i {
+    color: var(--replit-accent);
+}
+
+.feature-item p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: var(--replit-accent);
+    border-color: var(--replit-accent);
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #6a50e6;
+    border-color: #6a50e6;
+    transform: translateY(-2px);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('termsAcceptance');
+    const enterButton = document.getElementById('enterButton');
+
+    // Ativar/desativar botão quando checkbox mudar
+    checkbox.addEventListener('change', function() {
+        enterButton.disabled = !this.checked;
+    });
+
+    // Redirecionar para página principal quando botão for clicado
+    enterButton.addEventListener('click', function() {
+        if (checkbox.checked) {
+            window.location.href = "{{ url_for('index') }}";
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Resultados da Busca{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Banner de Título Verde -->
+        <div class="bg-success text-white p-3 rounded-top text-center mb-0">
+            <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informações do Telefone</h4>
+        </div>
+        
+        <!-- Conteúdo em fundo escuro -->
+        <div class="bg-dark text-light p-4 rounded-bottom">
+            <div class="mb-3">
+                <label class="mb-2">Número de Telefone</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark text-light border-secondary">
+                        <i class="fas fa-phone-alt"></i>
+                    </span>
+                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                           value="{{ phone_number }}" readonly>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="mb-2">País</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark text-light border-secondary">
+                        <i class="fas fa-globe"></i>
+                    </span>
+                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                           value="{{ country }}" readonly>
+                </div>
+            </div>
+            
+            {% if carrier %}
+            <div class="mb-3">
+                <label class="mb-2">Operadora</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark text-light border-secondary">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </span>
+                    <input type="text" class="form-control bg-dark text-light border-secondary" 
+                           value="{{ carrier }}" readonly>
+                </div>
+            </div>
+            {% endif %}
+                
+                <hr class="border-secondary my-4">
+                
+                <h5 class="text-center mb-4">Redes Sociais Detectadas</h5>
+                <div class="row text-center justify-content-center social-media-icons">
+                    {% for platform, info in location.social_media.items() %}
+                    <div class="col-4 mb-4">
+                        <a href="{{ info.url }}" class="social-icon" target="_blank">
+                            <div class="social-circle bg-{{ info.color }} mx-auto">
+                                <i class="fab {{ info.icon }} fa-2x"></i>
+                            </div>
+                            <p class="mt-2 mb-0 text-light">{{ info.name }}</p>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Mapa de localização -->
+                <div class="mt-4">
+                    {% if location.latitude and location.longitude %}
+                    <div id="map-container" class="rounded" style="height: 250px; width: 100%;">
+                        {{ location.map_html|safe }}
+                    </div>
+                    <p class="text-center mt-2 small text-secondary">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        {{ location.address }}
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="mt-4 text-center">
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-satellite me-2"></i>Rastreamento GPS</h5>
+                        <p class="mb-0">
+                            Deseja rastrear a localização exata deste número em tempo real?<br>
+                            Use nossa nova ferramenta de rastreamento GPS para criar links de monitoramento.
+                        </p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 col-lg-6 mx-auto mt-3">
+                        <a href="{{ url_for('location_tracker') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-satellite me-2"></i>Ir para o Rastreador GPS
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-1"></i> Nova Busca
+                </a>
+                <a href="{{ url_for('history') }}" class="btn btn-secondary ms-2">
+                    <i class="fas fa-history me-1"></i> Histórico
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<style>
+    .social-media-icons .social-icon {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: all 0.3s ease;
+    }
+    
+    .social-media-icons .social-icon:hover {
+        transform: translateY(-5px);
+    }
+    
+    .social-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        color: white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .bg-purple {
+        background-color: #665CAC;
+    }
+    
+    #tracking-url {
+        font-family: monospace;
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+</style>
+{% endblock %}
